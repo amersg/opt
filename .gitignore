@@ -22,3 +22,7 @@ docker-compose.override.yml
 # 🗑 system junk
 .DS_Store
 *.swp
+# WordPress core and uploads (keep only custom code)
+webapp/html/wp-admin/
+webapp/html/wp-includes/
+webapp/html/wp-content/uploads/
