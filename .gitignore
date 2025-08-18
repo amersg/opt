@@ -1,9 +1,24 @@
-.env
-*.pem
-*/html/*
-*/node_modules
+# 🔑 secrets & certs
 webapp/.env
+webapp/ca-cert.pem
 webapp/*.pem
 edge/*.pem
-*/node_modules
-*/html/*
+
+# 🐳 docker noise
+*.log
+*.pid
+*.sock
+docker-compose.override.yml
+
+# 📦 dependencies (if present later)
+*/node_modules/
+*/vendor/
+
+# �� wordpress content (optional: ignore bulk media/core; keep custom code)
+# webapp/html/*
+# !webapp/html/wp-content/themes/
+# !webapp/html/wp-content/plugins/
+
+# 🗑 system junk
+.DS_Store
+*.swp
