@@ -1,0 +1,9 @@
+.env
+*.pem
+*/html/*
+*/node_modules
+webapp/.env
+webapp/*.pem
+edge/*.pem
+*/node_modules
+*/html/*
