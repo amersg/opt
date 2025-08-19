@@ -8,7 +8,13 @@ services:
       - ./html:/var/www/html
       - ./ca-cert.pem:/etc/ssl/certs/db-ca.pem:ro
     networks: [internal]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+    
   wp-nginx:
     image: nginx:1.27-alpine
     container_name: wp-nginx
@@ -23,10 +29,15 @@ services:
     networks:
       - internal
       - webapp_internal
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   internal:
     driver: bridge
-    webapp_internal:
+  webapp_internal:
       external: true
       name: webapp_internal
