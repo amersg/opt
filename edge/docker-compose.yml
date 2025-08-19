@@ -9,10 +9,14 @@ services:
     volumes:
       - ./conf:/etc/nginx/conf.d:ro
       - ./html:/var/www/html
-      - ./logs:/var/log/nginx
+     # - ./logs:/var/log/nginx  # only if you really mount logs
     networks:
       - webapp_internal
-
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "7"
 networks:
   webapp_internal:
     external: true 
