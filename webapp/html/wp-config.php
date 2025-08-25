@@ -114,18 +114,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 
+/** Sets up WordPress vars and included files. */
+
 // --- Environment awareness ---
 $WP_ENV = getenv('WP_ENV') ?: 'development';   // read WP_ENV from .env, fallback to dev
 define('WP_ENV', $WP_ENV);                     // your own constant
 define('WP_ENVIRONMENT_TYPE', $WP_ENV);        // WP core constant (since 5.5)
 
-//This section is added by me for tls connection, localdomain name, and cookies
-define('WP_HOME',    'http://wp.internal.lan');
-define('WP_SITEURL', 'http://wp.internal.lan');
-define('COOKIE_DOMAIN','');
-define('COOKIEPATH','/');
-define('SITECOOKIEPATH','/');
+// --- Site URLs from environment (no hard-coding) ---
+if ($home = getenv('WP_HOME'))    define('WP_HOME', $home);
+if ($site = getenv('WP_SITEURL')) define('WP_SITEURL', $site);
 
+// (Cookie constants removed; WordPress will set sane defaults)
+
+// MySQL TLS (your CA is mounted at /etc/ssl/certs/db-ca.pem)
 if (!defined('MYSQL_CLIENT_FLAGS')) { define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL); }
 if (!defined('MYSQL_SSL_CA'))      { define('MYSQL_SSL_CA', '/etc/ssl/certs/db-ca.pem'); }
 
