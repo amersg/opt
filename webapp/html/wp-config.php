@@ -89,29 +89,11 @@ define( 'NONCE_SALT',       getenv_docker('WORDPRESS_NONCE_SALT',       '44925f1
 
 /**
  * WordPress database table prefix.
- *
- * You can have multiple installations in one database if you give each
- * a unique prefix. Only numbers, letters, and underscores please!
- *
- * At the installation time, database tables are created with the specified prefix.
- * Changing this value after WordPress is installed will make your site think
- * it has not been installed.
- *
- * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/#table-prefix
  */
 $table_prefix = getenv_docker('WORDPRESS_TABLE_PREFIX', 'wp_');
 
 /**
  * For developers: WordPress debugging mode.
- *
- * Change this to true to enable the display of notices during development.
- * It is strongly recommended that plugin and theme developers use WP_DEBUG
- * in their development environments.
- *
- * For information on other constants that can be used for debugging,
- * visit the documentation.
- *
- * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
 define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
 
@@ -119,11 +101,9 @@ define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
 
 
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
-// see also https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
 	$_SERVER['HTTPS'] = 'on';
 }
-// (we include this by default because reverse proxying is extremely common in container environments)
 
 if ($configExtra = getenv_docker('WORDPRESS_CONFIG_EXTRA', '')) {
 	eval($configExtra);
@@ -136,7 +116,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 
-/** Sets up WordPress vars and included files. */
+// --- Environment awareness ---
+$WP_ENV = getenv('WP_ENV') ?: 'development';   // read WP_ENV from .env, fallback to dev
+define('WP_ENV', $WP_ENV);                     // your own constant
+define('WP_ENVIRONMENT_TYPE', $WP_ENV);        // WP core constant (since 5.5)
 
 //This section is added by me for tls connection, localdomain name, and cookies
 define('WP_HOME',    'http://wp.internal.lan');
@@ -148,6 +131,5 @@ define('SITECOOKIEPATH','/');
 if (!defined('MYSQL_CLIENT_FLAGS')) { define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL); }
 if (!defined('MYSQL_SSL_CA'))      { define('MYSQL_SSL_CA', '/etc/ssl/certs/db-ca.pem'); }
 
-
+/** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
-
