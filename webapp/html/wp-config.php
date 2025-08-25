@@ -131,9 +131,15 @@ if (WP_ENV === 'production') {
     define('WP_DEBUG', true);
 }
 
+
 // Site URLs from environment
 if ($home = getenv('WP_HOME'))    define('WP_HOME', $home);
 if ($site = getenv('WP_SITEURL')) define('WP_SITEURL', $site);
+
+// Auto-updates (dev too) by wp
+if (!defined('WP_AUTO_UPDATE_CORE')) define('WP_AUTO_UPDATE_CORE', true);
+if (!defined('FS_METHOD')) define('FS_METHOD', 'direct');
+
 
 // (Cookie constants removed; WordPress will set sane defaults)
 
