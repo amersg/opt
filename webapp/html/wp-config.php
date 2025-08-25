@@ -103,9 +103,11 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARD
 }
 // (we include this by default because reverse proxying is extremely common in container environments)
 
-if ($configExtra = getenv_docker('WORDPRESS_CONFIG_EXTRA', '')) {
-	eval($configExtra);
-}
+// Allow arbitrary extra PHP code to be run after WordPress is configured
+//for now it is commented out because it has security risks and not needed 
+#if ($configExtra = getenv_docker('WORDPRESS_CONFIG_EXTRA', '')) {
+	#eval($configExtra);
+#}
 
 /* That's all, stop editing! Happy publishing. */
 
