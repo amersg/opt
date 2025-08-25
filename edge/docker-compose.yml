@@ -1,24 +1,52 @@
 version: "3.9"
+
 services:
   edge:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     container_name: edge-proxy
     restart: unless-stopped
+
+    # Publish HTTP now; add 443 when you wire TLS
     ports:
-      - "80:80"                      # add "443:443" after TLS is configured
+      - "80:80"
+      # - "443:443"   # later, after TLS
+
+    # Only mount what edge actually needs (conf + certs later)
     volumes:
-      - ./conf:/etc/nginx/conf.d:ro
-      - ./html:/var/www/html
-     # - ./logs:/var/log/nginx  # only if you really mount logs
+      - ./conf:/etc/nginx/conf.d:ro   # your edge conf files
+      # - ./certs:/etc/nginx/certs:ro # add when you have TLS certs
+      # - ./logs:/var/log/nginx       # optional; otherwise use container logs
+
     networks:
       - webapp_internal
+
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    read_only: true                   # root filesystem RO
+    tmpfs:                            # writable scratch areas Nginx needs
+      - /var/cache/nginx
+      - /var/run
+      - /var/log/nginx
+
+    # (Optional) drop all Linux capabilities (Nginx doesn’t need them here)
+    cap_drop:
+      - ALL
+
+    # Healthcheck so depends_on (elsewhere) can wait on edge if needed
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
 networks:
   webapp_internal:
-    external: true 
+    external: true
     name: webapp_internal
-
