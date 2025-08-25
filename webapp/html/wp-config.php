@@ -117,11 +117,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** Sets up WordPress vars and included files. */
 
 // --- Environment awareness ---
-$WP_ENV = getenv('WP_ENV') ?: 'development';   // read WP_ENV from .env, fallback to dev
-define('WP_ENV', $WP_ENV);                     // your own constant
-define('WP_ENVIRONMENT_TYPE', $WP_ENV);        // WP core constant (since 5.5)
+$WP_ENV = getenv('WP_ENV') ?: 'development';
+define('WP_ENV', $WP_ENV);
+define('WP_ENVIRONMENT_TYPE', $WP_ENV);
 
-// --- Site URLs from environment (no hard-coding) ---
+// --- Environment-specific toggles ---
+if (WP_ENV === 'production') {
+    define('WP_DEBUG', false);
+    define('DISALLOW_FILE_EDIT', true);
+} else {
+    define('WP_DEBUG', true);
+}
+
+// Site URLs from environment
 if ($home = getenv('WP_HOME'))    define('WP_HOME', $home);
 if ($site = getenv('WP_SITEURL')) define('WP_SITEURL', $site);
 
