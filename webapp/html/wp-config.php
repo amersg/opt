@@ -86,15 +86,7 @@ define( 'NONCE_SALT',       getenv_docker('WORDPRESS_NONCE_SALT',       '') );
  */
 $table_prefix = getenv_docker('WORDPRESS_TABLE_PREFIX', 'wp_');
 
-/**
- * For developers: WordPress debugging mode.
- *
- * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
- */
-define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
-
 /* Add any custom values between this line and the "stop editing" line. */
-
 
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 // see also https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
@@ -116,10 +108,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 
-/** Sets up WordPress vars and included files. */
-
 // --- Environment awareness ---
-$WP_ENV = getenv('WP_ENV') ?: 'development';
+$WP_ENV = getenv_docker('WP_ENV', 'development');
 define('WP_ENV', $WP_ENV);
 define('WP_ENVIRONMENT_TYPE', $WP_ENV);
 
@@ -128,22 +118,18 @@ if (WP_ENV === 'production') {
     define('WP_DEBUG', false);
     define('DISALLOW_FILE_EDIT', true);
 } else {
-    define('WP_DEBUG', true);
+    define('WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', ''));
 }
 
-
 // Site URLs from environment
-if ($home = getenv('WP_HOME'))    define('WP_HOME', $home);
-if ($site = getenv('WP_SITEURL')) define('WP_SITEURL', $site);
+if ($home = getenv_docker('WP_HOME', ''))    define('WP_HOME', $home);
+if ($site = getenv_docker('WP_SITEURL', '')) define('WP_SITEURL', $site);
 
-// Auto-updates (dev too) by wp
+// Auto-updates and file system
 if (!defined('WP_AUTO_UPDATE_CORE')) define('WP_AUTO_UPDATE_CORE', true);
 if (!defined('FS_METHOD')) define('FS_METHOD', 'direct');
 
-
-// (Cookie constants removed; WordPress will set sane defaults)
-
-// MySQL TLS (your CA is mounted at /etc/ssl/certs/db-ca.pem)
+// MySQL TLS
 if (!defined('MYSQL_CLIENT_FLAGS')) { define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL); }
 if (!defined('MYSQL_SSL_CA'))      { define('MYSQL_SSL_CA', '/etc/ssl/certs/db-ca.pem'); }
 
