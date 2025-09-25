@@ -121,16 +121,21 @@ if (WP_ENV === 'production') {
     define('WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', ''));
 }
 
-// Site URLs from environment
-if ($home = getenv_docker('WP_HOME', ''))    define('WP_HOME', $home);
-if ($site = getenv_docker('WP_SITEURL', '')) define('WP_SITEURL', $site);
+// Force canonical URLs
+define('WP_HOME',    'https://amer-alsabbagh.de');
+define('WP_SITEURL', 'https://amer-alsabbagh.de');
 
-// Force WordPress to use the correct domain for public access
-// Override WordPress URLs dynamically based on request
-if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'amer-alsabbagh.de') {
-    define('WP_HOME', 'https://amer-alsabbagh.de');
-    define('WP_SITEURL', 'https://amer-alsabbagh.de');
+// Tell WP it's HTTPS when coming via a proxy (Cloudflare/Tunnel/NGINX)
+if (
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+    (isset($_SERVER['HTTP_X_FORWARDED_SSL'])   && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+) {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = 443;
 }
+
+// Optional: force SSL on admin
+define('FORCE_SSL_ADMIN', true);
 
 // Auto-updates and file system
 if (!defined('WP_AUTO_UPDATE_CORE')) define('WP_AUTO_UPDATE_CORE', true);
