@@ -9,6 +9,7 @@ services:
       - ./html:/var/www/html
       - ./ca-cert.pem:/var/www/html/ca-cert.pem:ro
       - ./ca-cert.pem:/etc/ssl/certs/db-ca.pem:ro
+      - ./php-security.ini:/usr/local/etc/php/conf.d/99-security.ini:ro
     networks:
       - internal  # Only internal - no external access
     logging:
@@ -36,7 +37,7 @@ services:
       - ./ca-cert.pem:/etc/ssl/certs/db-ca.pem:ro
     networks:
       - internal
-    command: --default-authentication-plugin=mysql_native_password --ssl-ca=/etc/ssl/certs/db-ca.pem --ssl-mode=REQUIRED
+    command: --default-authentication-plugin=mysql_native_password
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pwordpress"]
       interval: 30s
