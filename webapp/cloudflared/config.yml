@@ -1,0 +1,12 @@
+tunnel: 31887844-98c1-4cca-972c-a9e519d5c302
+credentials-file: /etc/cloudflared/credentials.json
+originCertPath: /etc/cloudflared/cert.pem
+
+protocol: http2
+
+ingress:
+  - hostname: amer-alsabbagh.de
+    service: http://edge-nginx:80
+  - hostname: www.amer-alsabbagh.de
+    service: http://edge-nginx:80
+  - service: http_status:404

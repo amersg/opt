@@ -125,6 +125,13 @@ if (WP_ENV === 'production') {
 if ($home = getenv_docker('WP_HOME', ''))    define('WP_HOME', $home);
 if ($site = getenv_docker('WP_SITEURL', '')) define('WP_SITEURL', $site);
 
+// Force WordPress to use the correct domain for public access
+// Override WordPress URLs dynamically based on request
+if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'amer-alsabbagh.de') {
+    define('WP_HOME', 'https://amer-alsabbagh.de');
+    define('WP_SITEURL', 'https://amer-alsabbagh.de');
+}
+
 // Auto-updates and file system
 if (!defined('WP_AUTO_UPDATE_CORE')) define('WP_AUTO_UPDATE_CORE', true);
 if (!defined('FS_METHOD')) define('FS_METHOD', 'direct');

@@ -22,6 +22,32 @@ services:
       timeout: 5s
       retries: 3
 
+  wp-mysql:
+    image: mysql:8.0
+    container_name: wp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./ca-cert.pem:/etc/ssl/certs/db-ca.pem:ro
+    networks:
+      - internal
+    command: --default-authentication-plugin=mysql_native_password --ssl-ca=/etc/ssl/certs/db-ca.pem --ssl-mode=REQUIRED
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pwordpress"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   wp-nginx:
     image: nginx:1.27-alpine
     container_name: wp-nginx
@@ -48,8 +74,32 @@ services:
       timeout: 5s
       retries: 3
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config/config.yml run
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config/config.yml:ro
+      - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+    networks:
+      - webapp_internal      # Connect to edge-nginx
+      - webapp_webapp_internal  # Keep connection to wp-nginx
+    ports:
+      - "7844:7844/udp"  # QUIC port for tunnel
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql_data:
+
 networks:
   internal:
     driver: bridge
   webapp_internal:
     driver: bridge  # Create the shared network
+  webapp_webapp_internal:
+    driver: bridge  # Network for cloudflared to wp-nginx communication
